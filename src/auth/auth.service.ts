@@ -1,9 +1,9 @@
+import { Request, Response } from 'express';
+import { User } from './../users/entities/user.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
-import { User } from '../users/entities/user.entity';
 import { TokenPayload } from './token-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -19,8 +19,8 @@ export class AuthService {
     );
 
     const tokenPayload: TokenPayload = {
+      ...user,
       _id: user._id.toHexString(),
-      email: user.email,
     };
 
     const token = this.jwtService.sign(tokenPayload);
@@ -29,6 +29,15 @@ export class AuthService {
       httpOnly: true,
       expires,
     });
+  }
+
+  verifyWs(request: Request): TokenPayload {
+    const cookies: string[] = request.headers.cookie.split('; ');
+    const authCookie = cookies.find((cookie) =>
+      cookie.includes('Authentication'),
+    );
+    const jwt = authCookie.split('Authentication=')[1];
+    return this.jwtService.verify(jwt);
   }
 
   logout(response: Response) {

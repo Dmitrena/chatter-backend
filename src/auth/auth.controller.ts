@@ -1,9 +1,9 @@
+import { User } from './../users/entities/user.entity';
 import { Controller, Post, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
-import { User } from '../users/entities/user.entity';
-import { AuthService } from './auth.service';
-import { CurrentUser } from './current-user.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { CurrentUser } from './current-user.decorator';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +15,7 @@ export class AuthController {
     @CurrentUser() user: User,
     @Res({ passthrough: true }) response: Response,
   ) {
-    await this.authService.login(user, response);
+    return this.authService.login(user, response);
   }
 
   @Post('logout')
